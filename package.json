@@ -1,0 +1,20 @@
+{
+  "name": "auto-message",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/community": "^0.2.22",
+    "@langchain/core": "^0.2.18",
+    "@langchain/ollama": "^0.0.2",
+    "langchain": "^0.2.12",
+    "simple-git": "^3.25.0"
+  }
+}
