@@ -1,10 +1,12 @@
 class LoadingSpinner {
+    private message = 'Loading';
+    private interval = 100;
+    private frames = ['|', '/', '-', '\\'];
+    private currentFrame = 0;
+    private spinnerInterval: NodeJS.Timeout | null = null;
+
     constructor(message = 'Loading', interval = 100) {
-        this.message = message;
-        this.interval = interval;
-        this.frames = ['|', '/', '-', '\\'];
-        this.currentFrame = 0;
-        this.spinnerInterval = null;
+        Object.assign(this, { message, interval })
     }
 
     start() {

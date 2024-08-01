@@ -6,7 +6,14 @@ import { LoadingSpinner } from './loadingSpinner.js';
 async function getChangedFiles() {
     const git = simpleGit();
     try {
-        const diff = await git.diff();
+        const diff = await git.diff([
+            '--', 
+            ':(exclude)node_modules', 
+            ':(exclude)dist',
+            ':(exclude)package-lock.json',
+            ':(exclude)yarn.lock',
+            ':(exclude)pnpm-lock.yaml'
+        ]);
         return diff;
     } catch (error) {
         console.error('Error fetching changed files:', error);
@@ -14,7 +21,7 @@ async function getChangedFiles() {
     }
 }
 
-async function generateCommitMessage(files) {
+async function generateCommitMessage(context: string) {
     try {
         const spinner = new LoadingSpinner('Generating commit messages')
         const model = new ChatOllama({
@@ -25,12 +32,16 @@ async function generateCommitMessage(files) {
         const stream = await model
             .pipe(new StringOutputParser())
             .stream(`
-            Please generate a commit message for the following code changes, adhering to the style below.
-            This commit message follows standard professional guidelines, which include:
-            - Starting with a type (e.g., 'feat', 'fix', etc.) that describes the nature of the change.
-            - A brief description of the change itself.
-            **Output:**
-            For the given code changes, generate 3 commit message options: ${files}`);
+            Please generate a single commit message for the following code changes. The commit message should follow these guidelines:
+
+            - Start with a type (e.g., 'feat', 'fix', etc.) that describes the overall nature of the changes.
+            - Provide a brief, clear description that summarizes all the changes collectively.
+
+            The format of the commit message should resemble: 'fix: loading error'.
+            
+            **Code Changes**
+            ${context}
+            `);
 
         for await (const chunk of stream) {
             spinner.stop()
@@ -44,11 +55,9 @@ async function generateCommitMessage(files) {
     }
 }
 
-async function main() {
+export async function runCommitMate() {
     const changedFiles = await getChangedFiles();
     generateCommitMessage(changedFiles);
 }
-
-main();
 
 
