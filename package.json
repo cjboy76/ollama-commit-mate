@@ -1,7 +1,7 @@
 {
   "name": "auto-message",
   "version": "1.0.0",
-  "description": "",
+  "description": "auto message tool",
   "main": "main.js",
   "type": "module",
   "scripts": {
