@@ -1,11 +1,19 @@
 {
   "name": "commit-mate",
-  "version": "1.0.0",
-  "description": "auto message tool",
+  "version": "0.0.1",
   "type": "module",
+  "packageManager": "pnpm@9.5.0",
+  "description": "Create descriptive commit messages using Ollama",
+  "author": "YungTse Teng <yungtseteng@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/cjboy76/commit-mate#readme",
   "scripts": {
     "dev": "tsx src/command/cm.ts",
     "build": "npx unbuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjboy76/commit-mate.git"
   },
   "bin": {
     "cm": "./bin/index.mjs"
@@ -23,9 +31,7 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["git", "Ollama"],
   "dependencies": {
     "@langchain/community": "^0.2.22",
     "@langchain/core": "^0.2.18",
