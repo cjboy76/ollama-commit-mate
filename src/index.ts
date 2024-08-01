@@ -69,8 +69,6 @@ async function generateCommitMessage(context: string) {
             spinner.stop()
             process.stdout.write(chunk)
         }
-
-        console.log('')
     } catch (error) {
         console.error('Error generating commit message:', error);
         process.exit(1);
@@ -80,7 +78,6 @@ async function generateCommitMessage(context: string) {
 export async function runCommitMate() {
     const changedFiles = await getChangedFiles();
     const untrackedFiles = await getUntrackedFiles()
-    console.log(changedFiles + untrackedFiles)
     generateCommitMessage(changedFiles + untrackedFiles);
 }
 
