@@ -2,6 +2,7 @@ import { simpleGit } from 'simple-git';
 import { ChatOllama } from "@langchain/ollama";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { LoadingSpinner } from './loadingSpinner.js';
+import { promises as fs } from 'fs';
 
 async function getChangedFiles() {
     const git = simpleGit();
@@ -15,6 +16,27 @@ async function getChangedFiles() {
             ':(exclude)pnpm-lock.yaml'
         ]);
         return diff;
+    } catch (error) {
+        console.error('Error fetching changed files:', error);
+        process.exit(1);
+    }
+}
+
+async function readFileHandler(path: string) {
+    const filename = `+++ ${path}: \n`
+    const data = await fs.readFile(path, 'utf8')
+    return filename + data
+}
+
+async function getUntrackedFiles() {
+    const git = simpleGit();
+    try {
+        const untracked = await git.status()
+        const filePromiseList = untracked.not_added.map(path => {
+            return readFileHandler(path)
+        })
+        const resolvedList = await Promise.all(filePromiseList)
+        return resolvedList.join('\n')
     } catch (error) {
         console.error('Error fetching changed files:', error);
         process.exit(1);
@@ -57,7 +79,9 @@ async function generateCommitMessage(context: string) {
 
 export async function runCommitMate() {
     const changedFiles = await getChangedFiles();
-    generateCommitMessage(changedFiles);
+    const untrackedFiles = await getUntrackedFiles()
+    console.log(changedFiles + untrackedFiles)
+    generateCommitMessage(changedFiles + untrackedFiles);
 }
 
 
