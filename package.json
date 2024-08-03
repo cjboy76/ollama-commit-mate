@@ -1,6 +1,6 @@
 {
   "name": "ollama-commit-mate",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "packageManager": "pnpm@9.5.0",
   "description": "Create descriptive commit messages using Ollama",
@@ -8,9 +8,11 @@
   "license": "MIT",
   "homepage": "https://github.com/cjboy76/ollama-commit-mate#readme",
   "scripts": {
+    "prepublish": "npm run build",
     "dev": "tsx src/command/ocm.ts",
     "build": "npx unbuild",
-    "test:bin": "pnpm build && node ./bin/index.mjs"
+    "test:bin": "pnpm build && node ./bin/index.mjs",
+    "release": "npm publish"
   },
   "repository": {
     "type": "git",
