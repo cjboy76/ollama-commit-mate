@@ -7,6 +7,7 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { optionConfig } from './optionConfig';
 import { version as packageVersion } from '../package.json'
+import { defaultPrompt } from './prompt';
 
 async function getChangedFiles(props: { customExcludeList: string[] }) {
     const git = simpleGit();
@@ -55,13 +56,7 @@ async function generateCommitMessage(props: { context: string, model: string }) 
         const stream = await model
             .pipe(new StringOutputParser())
             .stream(`
-            Please generate a single commit message for the following code changes. The commit message should follow these guidelines:
-
-            - Start with a type (e.g., 'feat', 'fix', etc.) that describes the overall nature of the changes.
-            - Provide a brief, clear description that summarizes all the changes collectively.
-
-            The format of the commit message should resemble: 'fix: loading error'.
-            
+            ${defaultPrompt}
             **Code Changes**
             ${props.context}
             `);
