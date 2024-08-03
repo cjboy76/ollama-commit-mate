@@ -1,6 +1,6 @@
 {
   "name": "ollama-commit-mate",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "packageManager": "pnpm@9.5.0",
   "description": "Create descriptive commit messages using Ollama",
