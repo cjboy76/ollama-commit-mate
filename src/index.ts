@@ -6,8 +6,15 @@ import { promises as fs } from 'fs';
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { optionConfig } from './optionConfig';
-import { version as packageVersion } from '../package.json'
 import { defaultPrompt } from './prompt';
+import path from 'path';
+
+async function getVersion() {
+    const packageJsonPath = path.resolve(__dirname, '../package.json');
+    const packageJson = await fs.readFile(packageJsonPath, 'utf8');
+    const { version } = JSON.parse(packageJson);
+    return version;
+}
 
 async function getChangedFiles(props: { customExcludeList: string[] }) {
     const git = simpleGit();
@@ -72,6 +79,7 @@ async function generateCommitMessage(props: { context: string, model: string }) 
 }
 
 export async function runCommitMate() {
+    const packageVersion = await getVersion()
     const argv = await yargs(hideBin(process.argv))
         .version(packageVersion)
         .alias('v', 'version')
