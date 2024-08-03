@@ -9,7 +9,8 @@
   "homepage": "https://github.com/cjboy76/commit-mate#readme",
   "scripts": {
     "dev": "tsx src/command/cm.ts",
-    "build": "npx unbuild"
+    "build": "npx unbuild",
+    "test:bin": "pnpm build && node ./bin/index.mjs"
   },
   "repository": {
     "type": "git",

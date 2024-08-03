@@ -47,7 +47,7 @@ async function generateCommitMessage(props: { context: string, model: string }) 
     try {
         const spinner = new LoadingSpinner('Generating commit messages')
         const model = new ChatOllama({
-            baseUrl: "http://localhost:11434", // Default value
+            baseUrl: "http://localhost:11434",
             model: props.model,
         });
         spinner.start()
