@@ -8,9 +8,14 @@ import { hideBin } from 'yargs/helpers'
 import { optionConfig } from './optionConfig';
 import { defaultPrompt } from './prompt';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname_new = dirname(__filename);
 
 async function getVersion() {
-    const packageJsonPath = path.resolve(__dirname, '../package.json');
+    const packageJsonPath = path.resolve(__dirname_new, '../package.json');
     const packageJson = await fs.readFile(packageJsonPath, 'utf8');
     const { version } = JSON.parse(packageJson);
     return version;
