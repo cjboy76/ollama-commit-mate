@@ -6,6 +6,7 @@ import { promises as fs } from 'fs';
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { optionConfig } from './optionConfig';
+import { version as packageVersion } from '../package.json'
 
 async function getChangedFiles(props: { customExcludeList: string[] }) {
     const git = simpleGit();
@@ -77,9 +78,11 @@ async function generateCommitMessage(props: { context: string, model: string }) 
 
 export async function runCommitMate() {
     const argv = await yargs(hideBin(process.argv))
-    .options(optionConfig)
-    .help()
-    .argv;
+        .version(packageVersion)
+        .alias('v', 'version')
+        .options(optionConfig)
+        .help()
+        .argv;
     const changedFiles = await getChangedFiles({ customExcludeList: argv.exclude.map(String) });
     const untrackedFiles = argv.untracked ? await getUntrackedFiles() : ''
     generateCommitMessage({
