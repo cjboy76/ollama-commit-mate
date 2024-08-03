@@ -1,15 +1,16 @@
 # `ollama-commit-mate`
 
-`ollama-commit-mate` is a CLI tool designed to generate descriptive commit messages using AI models from Ollama. It allows for flexible configuration to meet various needs when creating commits.
-
-***Note***: Ensure that you have Ollama and models installed, as ollama-commit-mate relies on it to generate commit messages. You can find installation instructions for [Ollama](https://ollama.com/) in their official documentation.
-
 ## Installation
 
-To install `ollama-commit-mate` globally, use the following command:
+To use `ollama-commit-mate`, use the following command:
 
 ```bash
-npm install -g ollama-commit-mate
+npx ollama-commit-mate
+```
+
+Or try to install globally, you can use the `ocm` shorthand command to run it.
+```bash
+npm i -g ollama-commit-mate
 ```
 
 ### Options
@@ -26,27 +27,42 @@ npm install -g ollama-commit-mate
 ##### Basic Usage
 ```bash
 # Generate a commit message using the default settings:
+
+npx ollama-commit-mate
+
 ocm
 ```
 ##### Specify AI Model
 ```bash
 # Use a specific AI model for generating commit messages:
-ocm --model mistral
+
+npx ollama-commit-mate --model mistral
+
+ocm -m mistral
 ```
 
 ##### Change Base URL
 ```bash
 # Specify base URL for your Ollama port:
-ocm --baseUrl http://localhost:11434
+
+npx ollama-commit-mate --baseUrl http://localhost:11434
+
+ocm -url http://localhost:11434
 ```
 ##### Exclude Files
 ```bash
 # Exclude additional files or directories from the diff:
-ocm --exclude 'deploy/index.ts' 'dist'
+
+npx ollama-commit-mate --exclude 'deploy/index.ts' 'dist'
+
+ocm --ex 'deploy/index.ts' 'dist'
 ```
 ##### Include Untracked Files
 
 ```bash
 # Include untracked files in the output:
-ocm --untracked
+
+npx ollama-commit-mate --untracked
+
+ocm --un
 ```
