@@ -1,5 +1,5 @@
 {
-  "name": "commit-mate",
+  "name": "ollama-commit-mate",
   "version": "0.0.1",
   "type": "module",
   "packageManager": "pnpm@9.5.0",
@@ -8,7 +8,7 @@
   "license": "MIT",
   "homepage": "https://github.com/cjboy76/commit-mate#readme",
   "scripts": {
-    "dev": "tsx src/command/cm.ts",
+    "dev": "tsx src/command/ocm.ts",
     "build": "npx unbuild",
     "test:bin": "pnpm build && node ./bin/index.mjs"
   },
@@ -17,7 +17,7 @@
     "url": "git+https://github.com/cjboy76/commit-mate.git"
   },
   "bin": {
-    "cm": "./bin/index.mjs"
+    "ocm": "./bin/index.mjs"
   },
   "files": [
     "bin",

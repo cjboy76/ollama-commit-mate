@@ -2,7 +2,7 @@ import { defineBuildConfig } from 'unbuild'
 
 export default defineBuildConfig({
     entries: [{
-        input: 'src/command/cm',
+        input: 'src/command/ocm',
         name: 'index'
     }],
     clean: true,
