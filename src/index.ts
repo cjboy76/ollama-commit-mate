@@ -10,7 +10,7 @@ const argv = await yargs(hideBin(process.argv))
     .option('model', {
         alias: 'm',
         type: 'string',
-        description: 'The AI model to use',
+        description: 'The AI model to use (supports chat models in Ollama only). Default model is llama3.1.',
         default: 'llama3.1'
     })
     .option('baseUrl', {
