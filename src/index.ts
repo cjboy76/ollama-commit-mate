@@ -1,38 +1,11 @@
 import { simpleGit } from 'simple-git';
 import { ChatOllama } from "@langchain/ollama";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { LoadingSpinner } from './loadingSpinner.js';
+import { LoadingSpinner } from './loadingSpinner';
 import { promises as fs } from 'fs';
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-
-const argv = await yargs(hideBin(process.argv))
-    .option('model', {
-        alias: 'm',
-        type: 'string',
-        description: 'The AI model to use (supports chat models in Ollama only). Default model is llama3.1.',
-        default: 'llama3.1'
-    })
-    .option('baseUrl', {
-        alias: 'url',
-        type: 'string',
-        description: 'The base URL of the AI model API',
-        default: 'http://localhost:11434'
-    })
-    .option('exclude', {
-        alias: 'e',
-        type: 'array',
-        description: 'Files or directories to exclude from diff',
-        default: ['node_modules', 'dist', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml']
-    })
-    .option('untracked', {
-        alias: 'un',
-        type: 'boolean',
-        description: 'When true, this feature allows the inclusion of untracked files in the output, providing a more comprehensive view of system changes.',
-        default: false
-    })
-    .help()
-    .argv;
+import { optionConfig } from './optionConfig';
 
 async function getChangedFiles(props: { customExcludeList: string[] }) {
     const git = simpleGit();
@@ -58,12 +31,12 @@ async function readFileHandler(path: string) {
 async function getUntrackedFiles() {
     const git = simpleGit();
     try {
-        const untracked = await git.status()
-        const filePromiseList = untracked.not_added.map(path => {
+        const gitStatus = await git.status()
+        const untracked = gitStatus.not_added.map(path => {
             return readFileHandler(path)
         })
-        const resolvedList = await Promise.all(filePromiseList)
-        return resolvedList.join('\n')
+        const untrackedContext = await Promise.all(untracked)
+        return untrackedContext.join('\n')
     } catch (error) {
         console.error('Error fetching changed files:', error);
         process.exit(1);
@@ -103,6 +76,10 @@ async function generateCommitMessage(props: { context: string, model: string }) 
 }
 
 export async function runCommitMate() {
+    const argv = await yargs(hideBin(process.argv))
+    .options(optionConfig)
+    .help()
+    .argv;
     const changedFiles = await getChangedFiles({ customExcludeList: argv.exclude.map(String) });
     const untrackedFiles = argv.untracked ? await getUntrackedFiles() : ''
     generateCommitMessage({
