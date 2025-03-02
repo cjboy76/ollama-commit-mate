@@ -2,8 +2,7 @@
   "name": "ollama-commit-mate",
   "version": "0.0.9",
   "type": "module",
-  "packageManager": "pnpm@9.5.0",
-  "description": "Create descriptive commit messages using Ollama",
+  "description": "Create commit messages with Ollama",
   "author": "YungTse Teng <yungtseteng@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/cjboy76/ollama-commit-mate#readme",
@@ -39,16 +38,14 @@
     "Ollama"
   ],
   "dependencies": {
-    "@langchain/community": "^0.2.22",
-    "@langchain/core": "^0.2.18",
-    "@langchain/ollama": "^0.0.2",
+    "@clack/prompts": "^0.10.0",
     "bumpp": "^9.4.2",
     "langchain": "^0.2.12",
+    "ollama": "^0.5.14",
     "simple-git": "^3.25.0",
     "tsx": "^4.16.4",
     "typescript": "^5.5.4",
-    "unbuild": "^2.0.0",
-    "yargs": "^17.7.2"
+    "unbuild": "^2.0.0"
   },
   "devDependencies": {
     "@types/yargs": "^17.0.32"
