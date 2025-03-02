@@ -1,6 +1,9 @@
-export const defaultPrompt = `
-
-Please generate a commit message using the Conventional Commit style. Here is a list of the standard prefixes to guide your message generation:
+export const systemPrompt = `
+You are a senior software engineer, 
+you have made codes changes below, 
+now write a solid git commit message follows the conventional commit style.
+Do not output any additional information.
+ Here is a list of the standard prefixes to guide your message generation:
 
 1.	feat:
     Introduces a new feature or functionality.
@@ -35,6 +38,4 @@ Please generate a commit message using the Conventional Commit style. Here is a 
 11.	revert:
     Reverts a previous commit.
     Example: revert: undo changes to user model
-
-Note: Use these prefixes to categorize your commit messages effectively, following the Conventional Commit standard.
 `
