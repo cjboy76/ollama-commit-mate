@@ -1,102 +1,77 @@
 import { simpleGit } from 'simple-git';
-import { ChatOllama } from "@langchain/ollama";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { LoadingSpinner } from './loadingSpinner';
-import { promises as fs } from 'fs';
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
-import { optionConfig } from './optionConfig';
-import { defaultPrompt } from './prompt';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { systemPrompt } from './prompt';
+import ollama from 'ollama';
+import { log, multiselect, select, spinner } from '@clack/prompts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname_new = dirname(__filename);
-
-async function getVersion() {
-    const packageJsonPath = path.resolve(__dirname_new, '../package.json');
-    const packageJson = await fs.readFile(packageJsonPath, 'utf8');
-    const { version } = JSON.parse(packageJson);
-    return version;
+async function selectModelStep() {
+    const availableModels = await fetchOllamaModels()
+    if (!availableModels.length) {
+        throw new Error('No available ollama models.');
+    }
+    return select({
+        message: 'Pick a ollama model',
+        options: availableModels,
+    });
 }
 
-async function getChangedFiles(props: { customExcludeList: string[] }) {
-    const git = simpleGit();
-    const defaultExcludeList = props.customExcludeList.length ? props.customExcludeList : ['node_modules', 'dist', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml']
+async function fetchOllamaModels() {
     try {
-        const diff = await git.diff([
-            '--',
-            ...defaultExcludeList.map(ex => `:(exclude)${ex}`)
-        ]);
-        return diff;
-    } catch (error) {
-        console.error('Error fetching changed files:', error);
-        process.exit(1);
+        const response = await ollama.list()
+        return response.models.map(model => ({ label: model.name, value: model.name }))
+    } catch {
+        return []
     }
 }
 
-async function readFileHandler(path: string) {
-    const filename = `+++ ${path}: \n`
-    const data = await fs.readFile(path, 'utf8')
-    return filename + data
-}
-
-async function getUntrackedFiles() {
+async function readChangedFilesName() {
     const git = simpleGit();
     try {
-        const gitStatus = await git.status()
-        const untracked = gitStatus.not_added.map(path => {
-            return readFileHandler(path)
-        })
-        const untrackedContext = await Promise.all(untracked)
-        return untrackedContext.join('\n')
-    } catch (error) {
-        console.error('Error fetching changed files:', error);
-        process.exit(1);
-    }
-}
-
-async function generateCommitMessage(props: { context: string, model: string }) {
-    try {
-        const spinner = new LoadingSpinner('Generating commit messages')
-        const model = new ChatOllama({
-            baseUrl: "http://localhost:11434",
-            model: props.model,
+        const diff = await git.diff({
+            '--name-only': null,
         });
-        spinner.start()
-        const stream = await model
-            .pipe(new StringOutputParser())
-            .stream(`
-            ${defaultPrompt}
-            **Code Changes**
-            ${props.context}
-            `);
+        const files = diff.split('\n').filter(Boolean)
+        return files.map(file => ({ value: file, label: file }));
+    } catch (error) {
+        return []
+    }
+}
 
-        for await (const chunk of stream) {
-            spinner.stop()
-            process.stdout.write(chunk)
+function readFilesDiff(filePaths: string[]) {
+    const git = simpleGit()
+    return git.diff(['HEAD', '--', ...filePaths])
+}
+
+async function getDiffsStep() {
+    const changedFiles = await readChangedFilesName();
+    const selected = await multiselect({
+        message: 'Select files you want to generate commit message.',
+        options: changedFiles
+    })
+    return readFilesDiff(selected as string[])
+}
+
+export async function execute() {
+    const s = spinner()
+    try {
+        const selectedModel = await selectModelStep()
+        const diffs = await getDiffsStep()
+
+        s.start('Generating commit message...')
+        const ollamaStream = await ollama.generate({
+            stream: true,
+            model: selectedModel as string,
+            system: systemPrompt,
+            prompt: diffs,
+        })
+        s.stop()
+
+        for await (const part of ollamaStream) {
+            process.stdout.write(part.response);
         }
     } catch (error) {
-        console.error('Error generating commit message:', error);
+        log.error(`Error: ${(error as Error).message}`);
         process.exit(1);
     }
-}
-
-export async function runCommitMate() {
-    const packageVersion = await getVersion()
-    const argv = await yargs(hideBin(process.argv))
-        .version(packageVersion)
-        .alias('v', 'version')
-        .options(optionConfig)
-        .help()
-        .argv;
-    const changedFiles = await getChangedFiles({ customExcludeList: argv.exclude.map(String) });
-    const untrackedFiles = argv.untracked ? await getUntrackedFiles() : ''
-    generateCommitMessage({
-        context: changedFiles + untrackedFiles,
-        model: argv.model
-    });
 }
 
 

@@ -1,3 +1,3 @@
-import { runCommitMate } from '../index'
+import { execute } from '../index'
 
-runCommitMate()
+execute()
