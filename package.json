@@ -9,7 +9,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "dev": "tsx src/command/ocm.ts",
-    "build": "npx unbuild",
+    "build": "unbuild",
     "test:bin": "pnpm build && node ./bin/index.mjs",
     "release": "bumpp && npm publish"
   },
