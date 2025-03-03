@@ -1,7 +1,14 @@
 import { simpleGit } from 'simple-git';
-import { systemPrompt } from './prompt';
 import ollama from 'ollama';
 import { log, multiselect, select, spinner } from '@clack/prompts';
+
+const systemPrompt = `
+You are an expert developer specialist in creating commits.
+Provide a super concise commit message of the user \`git diff\` output following strictly the next rules:
+    - Use conventional commit.
+    - Do not use any code snippets, imports, file routes or bullets points.
+    - Do not mention the route of file that has been change.
+`
 
 async function selectModelStep() {
     const availableModels = await fetchOllamaModels()
@@ -57,16 +64,19 @@ export async function execute() {
         const diffs = await getDiffsStep()
 
         s.start('Generating commit message...')
-        const ollamaStream = await ollama.generate({
+        console.log({ diffs })
+        const ollamaStream = await ollama.chat({
             stream: true,
             model: selectedModel as string,
-            system: systemPrompt,
-            prompt: diffs,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: `Here is the \`git diff\` output: ${diffs}` },
+            ],
         })
         s.stop()
 
         for await (const part of ollamaStream) {
-            process.stdout.write(part.response);
+            process.stdout.write(part.message.content);
         }
     } catch (error) {
         log.error(`Error: ${(error as Error).message}`);
